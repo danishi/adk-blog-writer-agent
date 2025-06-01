@@ -3,7 +3,9 @@ Google ADKを使ったブログ生成エージェントのサンプル
 
 ## チュートリアル
 ```bash
-teachme tutorial.md
+$ git clone https://github.com/danishi/adk-blog-writer-agent.git
+$ cd adk-blog-writer-agent
+$ teachme tutorial.md
 ```
 
 ## Getting Started
