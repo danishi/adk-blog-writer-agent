@@ -32,5 +32,5 @@ python deployment/deploy.py --delete --resource_id=${AGENT_ENGINE_ID}
 ## UI Testing
 
 ```bash
-streamlit run ui.py
+streamlit run ui.py --server.enableCORS=false
 ```
