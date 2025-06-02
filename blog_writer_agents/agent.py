@@ -5,7 +5,8 @@ from google.adk.tools.agent_tool import AgentTool
 
 from .sub_agents.researcher import researcher_agent
 from .sub_agents.blog_editor import blog_editor_agent
-from .sub_agents.eyecatch_designer import eyecatch_designer_agent
+from .tools.generate_image import generate_image
+from google.adk.tools import ToolContext, load_artifacts
 
 
 MODEL = "gemini-2.5-pro-preview-05-06" 
@@ -15,14 +16,15 @@ BLOG_COORDINATOR_PROMPT = """
 デジタル上の個性を明確に定義し、それを形にしていくプロセスを段階的に案内してください。
 
 各ステップでは、必ず指定されたサブエージェントを呼び出し、指定された入力および出力形式を厳密に守ってください。
+必ずしも各ステップを遵守する必要はなく、ユーザーの求めがあれば柔軟に振る舞ってください。
 
 ---
 
 ### ステップ 1：ブログのための魅力的なテーマやネタを決める（Subagent: `researcher`）
 
 * **入力内容：** ユーザーにブログのテーマやキーワード（例：旅行、ガジェット、育児など）を尋ねてください。
-* **実行内容：** そのキーワードを使って `researcher` サブエージェントを呼び出してください。
-* **期待される出力：** `researcher` サブエージェントは、少なくとも10個の鮮度の高いブログ記事のアイデアを生成します。
+* **実行内容：** そのキーワードを使ってリサーチャーサブエージェントを呼び出してください。
+* **期待される出力：** リサーチャーサブエージェントは、少なくとも10個の鮮度の高いブログ記事のアイデアを生成します。
 * **注意点：** ユーザーが選んだテーマに基づいて、ブログ記事のアイデアを提案してください。例えば、旅行なら「世界の絶景スポット」や「バックパッカーの旅のコツ」など。
   ユニークで読者の関心を引くような、ブランド性の高い名前を提案してください。
   リストをユーザーに提示し、1つを選んでもらいましょう。
@@ -32,17 +34,17 @@ BLOG_COORDINATOR_PROMPT = """
 ### ステップ 2：プロフェッショナルなブログ記事を作成する（Subagent: `blog_editor`）
 
 * **入力内容：** ユーザーが選んだブログ記事のテーマやネタ。
-* **実行内容：** `blog_editor` サブエージェントを使って、選ばれたテーマに基づいてブログ記事を作成してください。
+* **実行内容：** ブログ編集者サブエージェントを使って、選ばれたテーマに基づいてブログ記事を作成してください。
 * **期待される出力：** プロフェッショナルなブログ記事の内容が生成されます。
 * **注意点：** 記事はSEOを意識し、読者の興味を引くような内容にしてください。見出しや段落分けも適切に行い、読みやすい構成にしてください。
   また、記事の最後には読者に行動を促すCTA（Call to Action）を含めることも忘れずに。
 
 ---
 
-### ステップ 3：ブログの印象を決定づけるアイキャッチをデザインする（Subagent: `eyecatch_designer`）
+### ステップ 3：ブログの印象を決定づけるアイキャッチをデザインする（Tool: `generate_image`）
 
 * **入力内容：** ユーザーが選んだブログ記事のテーマやネタ、およびブランドイメージ。
-* **実行内容：** `eyecatch_designer` サブエージェントを使って、ブログ用のアイキャッチ画像を作成してください。
+* **実行内容：** 画像生成ツールを使って、ブログ用のアイキャッチ画像を作成してください。
 * **期待される出力：** プロフェッショナルで魅力的なアイキャッチ画像が生成されます。
 * **注意点：** アイキャッチ画像は、ブログ記事の内容を視覚的に表現し、読者の興味を引くものでなければなりません。
   ブランドカラーやフォントを使用して、一貫したブランドイメージを保つようにしてください。
@@ -69,8 +71,10 @@ blog_coordinator = LlmAgent(
     tools=[
         AgentTool(agent=researcher_agent),
         AgentTool(agent=blog_editor_agent),
-        AgentTool(agent=eyecatch_designer_agent),
+        generate_image,
+        load_artifacts
     ],
+    sub_agents=[]
 )
 
 root_agent = blog_coordinator
