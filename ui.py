@@ -23,7 +23,7 @@ def sidebar_inputs():
     st.sidebar.title("設定")
     agent_id = st.sidebar.text_input(
         "Agent Engine の ID",
-        value=os.getenv("GOOGLE_CLOUD_AGENT_ENGINE_ID"),
+        value=os.getenv("REMOTE_AGENT_ENGINE_ID"),
         max_chars=20
     )
     user_id = st.sidebar.text_input(
