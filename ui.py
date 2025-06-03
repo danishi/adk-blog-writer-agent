@@ -10,10 +10,10 @@ import asyncio
 from blog_writer_agents.agent import root_agent
 
 logging.basicConfig(level=logging.INFO)
+load_dotenv()
 
 
 def init_vertexai():
-    load_dotenv()
     project_id = os.getenv("GOOGLE_CLOUD_PROJECT")
     location = os.getenv("GOOGLE_CLOUD_LOCATION")
     vertexai.init(project=project_id, location=location)
@@ -23,7 +23,7 @@ def sidebar_inputs():
     st.sidebar.title("設定")
     agent_id = st.sidebar.text_input(
         "Agent Engine の ID",
-        value="5281781180952215552",
+        value=os.getenv("GOOGLE_CLOUD_AGENT_ENGINE_ID"),
         max_chars=20
     )
     user_id = st.sidebar.text_input(
