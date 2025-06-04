@@ -4,4 +4,5 @@ pydantic==2.11.5
 python-dotenv==1.1.0
 google-cloud-aiplatform[adk,agent-engines]==1.91.0
 absl-py==2.2.1
+pillow==11.2.1
 streamlit==1.45.1

@@ -34,6 +34,7 @@ def create() -> None:
             "google-genai (>=1.5.0,<2.0.0)",
             "pydantic (>=2.10.6,<3.0.0)",
             "absl-py (>=2.2.1,<3.0.0)",
+            "pillow (>=11.0.0,<11.2.1)"
         ],
         extra_packages=["blog_writer_agents"],
     )
