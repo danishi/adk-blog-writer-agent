@@ -122,7 +122,10 @@ async def handle_user_input(prompt):
                 logging.info(f"Received event: {str(event)}")
                 for i, part in enumerate(event["content"]["parts"]):
                     if "text" in part:
-                        full_response += part["text"] + " "
+                        if part["text"].startswith("data:image"):
+                            st.image(part["text"], use_container_width=True)
+                        else:
+                            full_response += part["text"] + " "
                         message_placeholder.markdown(full_response + "▌")
                     if "function_call" in part:
                         message_placeholder.markdown(full_response + f"\n\n🔧 tool_calling: {str(part['function_call'])}")

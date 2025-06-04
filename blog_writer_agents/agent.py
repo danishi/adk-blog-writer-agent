@@ -1,15 +1,27 @@
 """ルートエージェント"""
 
+import copy, base64, os
+from io import BytesIO
+from PIL import Image
+import logging
+
 from google.adk.agents import LlmAgent
 from google.adk.tools.agent_tool import AgentTool
+from dotenv import load_dotenv
 
 from .sub_agents.researcher import researcher_agent
 from .sub_agents.blog_editor import blog_editor_agent
 from .tools.generate_image import generate_image
 from google.adk.tools import ToolContext, load_artifacts
+from google.genai.types import Part
+from google.adk.agents.callback_context import CallbackContext
+from google.adk.models import LlmResponse
 
+load_dotenv()
+logging.basicConfig(level=logging.ERROR)
 
-MODEL = "gemini-2.5-pro-preview-05-06" 
+MODEL = "gemini-2.5-pro-preview-05-06"
+IMAGE_FILE_NAME = os.getenv("IMAGE_FILE_NAME")
 
 BLOG_COORDINATOR_PROMPT = """
 マーケティングとコンテンツ戦略の専門家です。あなたの目的は、ユーザーが魅力的なブログ記事を作成し、多くの反響を得られるようにサポートすることです。
@@ -57,6 +69,48 @@ BLOG_COORDINATOR_PROMPT = """
 """
 
 
+async def callback_load_artifact(
+    callback_context: CallbackContext,
+    llm_response: LlmResponse
+) -> LlmResponse:
+
+    try:
+        if not (llm_response.content and llm_response.content.parts):
+            return llm_response
+
+        parts_new = []
+        for part in copy.deepcopy(llm_response.content.parts):
+            parts_new.append(part)
+            if not part.text:
+                continue
+
+            image_artifact = await callback_context.load_artifact(filename=IMAGE_FILE_NAME)
+            if not image_artifact:
+                part.text = part.text.replace(
+                    f'<artifact>{IMAGE_FILE_NAME}</artifact>',
+                    f'<artifact>_none_{IMAGE_FILE_NAME}</artifact>'
+                )
+                parts_new[-1] = part
+            # Convert PNG to JPEG to reduce data size
+            image_bytes = image_artifact.inline_data.data
+            img = Image.open(BytesIO(image_bytes)).convert('RGB')
+            img = img.resize((500, int(img.height * (500 / img.width))))
+            jpg_buffer = BytesIO()
+            img.save(jpg_buffer, 'JPEG', quality=70)
+            jpg_binary = jpg_buffer.getvalue()
+            base64_encoded = base64.b64encode(jpg_binary).decode('utf-8')
+            mime_string = f'data:image/jpeg;base64,{base64_encoded}'
+            parts_new.append(Part.from_text(text=mime_string))
+
+        llm_response_new = copy.deepcopy(llm_response)
+        llm_response_new.content.parts = parts_new
+        return llm_response_new
+
+    except Exception as e: # fall back to the original response
+        logging.error(e)
+        return llm_response
+
+
 blog_coordinator = LlmAgent(
     name="blog_coordinator",
     model=MODEL,
@@ -74,7 +128,8 @@ blog_coordinator = LlmAgent(
         generate_image,
         load_artifacts
     ],
-    sub_agents=[]
+    sub_agents=[],
+    after_model_callback=callback_load_artifact
 )
 
 root_agent = blog_coordinator
