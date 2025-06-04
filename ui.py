@@ -37,12 +37,12 @@ def sidebar_inputs():
     agent_id = st.sidebar.text_input(
         "Agent Engine の ID",
         value=os.getenv("REMOTE_AGENT_ENGINE_ID"),
-        max_chars=20
+        max_chars=20,
     )
     user_id = st.sidebar.text_input(
         "ユーザー ID",
         value="user1",
-        max_chars=10
+        max_chars=10,
     )
     return agent_id, user_id
 
@@ -76,20 +76,60 @@ def get_remote_agent(agent_id):
 
 remote_agent = get_remote_agent(agent_id)
 
+# ユーザーに紐づくセッション一覧取得
+async def fetch_session_ids(user_id: str):
+    try:
+        if ENV == "local":
+            response = await remote_agent.list_sessions(user_id=user_id)
+        else:
+            response = remote_agent.list_sessions(user_id=user_id)
+        # response may be an object or a plain dictionary depending on environment
+        sessions = None
+        if isinstance(response, dict):
+            sessions = response.get("sessions", response)
+        else:
+            sessions = getattr(response, "sessions", response)
+
+        session_ids = []
+        for s in sessions:
+            if isinstance(s, dict):
+                session_ids.append(s.get("id") or s.get("session_id") or s.get("name"))
+            else:
+                session_ids.append(getattr(s, "id", getattr(s, "session_id", None)))
+        return [sid for sid in session_ids if sid]
+    except Exception as e:
+        st.sidebar.error(f"セッション一覧取得エラー: {e}")
+        return []
+
+# 既存セッション一覧の取得と選択
+session_list = asyncio.run(fetch_session_ids(user_id))
+options = ["新規セッション"] + session_list
+index = 0
+if "session_id" in st.session_state and st.session_state["session_id"] in session_list:
+    index = session_list.index(st.session_state["session_id"]) + 1
+selected = st.sidebar.selectbox("セッション選択", options=options, index=index)
+
 # セッション管理
-async def manage_session(user_id, agent_id):
+async def manage_session(user_id, agent_id, selected_session_id=None):
     if (
-        "session_id" not in st.session_state or
-        st.session_state.get("last_agent_id") != agent_id or
-        st.session_state.get("last_user_id") != user_id
+        "session_id" not in st.session_state
+        or st.session_state.get("last_agent_id") != agent_id
+        or st.session_state.get("last_user_id") != user_id
+        or (
+            selected_session_id
+            and st.session_state.get("session_id") != selected_session_id
+        )
     ):
         try:
-            if ENV == "local":
-                session = await remote_agent.create_session(user_id=user_id)
-                st.session_state["session_id"] = session.id
+            if selected_session_id:
+                st.session_state["session_id"] = selected_session_id
             else:
-                session = remote_agent.create_session(user_id=user_id)
-                st.session_state["session_id"] = session["id"]
+                if ENV == "local":
+                    session = await remote_agent.create_session(user_id=user_id)
+                    st.session_state["session_id"] = session.id
+                else:
+                    session = remote_agent.create_session(user_id=user_id)
+                    st.session_state["session_id"] = session["id"]
 
             st.session_state["last_agent_id"] = agent_id
             st.session_state["last_user_id"] = user_id
@@ -98,7 +138,8 @@ async def manage_session(user_id, agent_id):
             st.error(f"セッション作成エラー: {e}")
             st.stop()
 
-asyncio.run(manage_session(user_id, agent_id))
+selected_session_id = None if selected == "新規セッション" else selected
+asyncio.run(manage_session(user_id, agent_id, selected_session_id))
 
 # チャット履歴表示
 for msg in st.session_state["messages"]:
