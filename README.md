@@ -9,6 +9,10 @@
 - **Image Generator Tool**: ブログ用のアイキャッチ画像を作成します。
 - **Streamlit UI**: チャット形式でエージェントとやり取りできる簡易 UI を提供します。
 
+## 構成図
+
+![image](https://github.com/user-attachments/assets/1a7ab16a-1ccb-45db-a61e-a5cc5eb5703b)
+
 ## 環境構築
 
 1. リポジトリをクローンします。
