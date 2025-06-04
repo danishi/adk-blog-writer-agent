@@ -32,5 +32,5 @@ async def generate_image(prompt: str, tool_context: 'ToolContext'):
     return {
         'status': 'success',
         'detail': 'Image generated successfully and stored in artifacts.',
-        'filename': 'image.png',
+        'filename': os.getenv("IMAGE_FILE_NAME"),
     }
