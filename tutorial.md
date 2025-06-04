@@ -19,9 +19,24 @@ teachme tutorial.md
    cp .env.example .env
    ```
 
-2. `.env` を開き、ご自身のプロジェクト ID やストレージバケット名などを入力します。
+2. `.env` を開き、ご自身のプロジェクト ID やGCSバケット名などを入力します。
 
-3. Python 仮想環境を作成して依存パッケージをインストールします。
+   ```env
+   # Environment
+   ENV=local # StremalitのUIを使う場合に設定、ローカルのADKを呼び出すかリモートのAgent Engineを呼び出すか（local以外に設定）
+   
+   # ADK
+   GOOGLE_GENAI_USE_VERTEXAI=TRUE
+   GOOGLE_CLOUD_PROJECT=<your_project_id>
+   GOOGLE_CLOUD_LOCATION=<your_project_location>
+   GOOGLE_CLOUD_STORAGE_BUCKET=<your-storage-bucket>
+   IMAGE_FILE_NAME=image.png
+   
+   # Streamlit
+   REMOTE_AGENT_ENGINE_ID=9999999999999999999
+   ```
+
+4. Python 仮想環境を作成して依存パッケージをインストールします。
 
    ```bash
    python -m venv .venv
@@ -29,7 +44,7 @@ teachme tutorial.md
    pip install -r requirements.txt
    ```
 
-4. 開発用サーバーを起動します。
+5. 開発用サーバーを起動します。
 
    ```bash
    adk web
