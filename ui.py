@@ -83,7 +83,20 @@ async def fetch_session_ids(user_id: str):
             response = await remote_agent.list_sessions(user_id=user_id)
         else:
             response = remote_agent.list_sessions(user_id=user_id)
-        return [s.id for s in response.sessions]
+        # response may be an object or a plain dictionary depending on environment
+        sessions = None
+        if isinstance(response, dict):
+            sessions = response.get("sessions", response)
+        else:
+            sessions = getattr(response, "sessions", response)
+
+        session_ids = []
+        for s in sessions:
+            if isinstance(s, dict):
+                session_ids.append(s.get("id") or s.get("session_id") or s.get("name"))
+            else:
+                session_ids.append(getattr(s, "id", getattr(s, "session_id", None)))
+        return [sid for sid in session_ids if sid]
     except Exception as e:
         st.sidebar.error(f"セッション一覧取得エラー: {e}")
         return []
