@@ -5,7 +5,20 @@ import vertexai
 from vertexai import agent_engines
 from vertexai.preview import reasoning_engines
 import logging
-import asyncio 
+import asyncio
+
+# Python 3.12 introduced ``asyncio.wrap_async_iterable`` for turning a
+# synchronous iterator into an asynchronous one.  Earlier Python versions do
+# not provide this helper, so we implement a compatible fallback.  This ensures
+# that streaming works regardless of the Python runtime version.
+if hasattr(asyncio, "wrap_async_iterable"):
+    _wrap_async_iterable = asyncio.wrap_async_iterable
+else:
+    def _wrap_async_iterable(iterable):
+        async def _gen():
+            for item in iterable:
+                yield item
+        return _gen()
 
 from blog_writer_agents.agent import root_agent
 
@@ -102,22 +115,13 @@ async def handle_user_input(prompt):
         full_response = ""
         with st.chat_message("assistant"):
             message_placeholder = st.empty()
-            if ENV != "local":
-                stream = asyncio.wrap_async_iterable(remote_agent.stream_query(
+            stream = _wrap_async_iterable(
+                remote_agent.stream_query(
                     user_id=user_id,
                     session_id=st.session_state["session_id"],
                     message=prompt,
-                ))
-            else:
-                # Wrap the synchronous generator to make it async
-                async def async_generator_wrapper(sync_generator):
-                    for item in sync_generator:
-                        yield item
-                stream = async_generator_wrapper(remote_agent.stream_query(
-                    user_id=user_id,
-                    session_id=st.session_state["session_id"],
-                    message=prompt,
-                ))
+                )
+            )
             async for event in stream:
                 logging.info(f"Received event: {str(event)}")
                 for i, part in enumerate(event["content"]["parts"]):
