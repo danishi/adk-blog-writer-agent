@@ -23,10 +23,16 @@ flags.mark_bool_flags_as_mutual_exclusive(["create", "delete"])
 
 def create() -> None:
     """新しいエージェントを作成"""
-    adk_app = reasoning_engines.AdkApp(agent=root_agent, enable_tracing=True)
+    env_vars = {"IMAGE_FILE_NAME": os.getenv("IMAGE_FILE_NAME", "image.png")}
+
+    adk_app = reasoning_engines.AdkApp(
+        agent=root_agent,
+        enable_tracing=True,
+    )
 
     remote_agent = agent_engines.create(
         adk_app,
+        env_vars=env_vars,
         display_name=root_agent.name,
         requirements=[
             "google-adk (>=0.0.2)",

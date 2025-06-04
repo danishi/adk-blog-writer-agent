@@ -25,12 +25,13 @@ async def generate_image(prompt: str, tool_context: 'ToolContext'):
     if not response.generated_images:
         return {"status": "failed"}
     image_bytes = response.generated_images[0].image.image_bytes
+    image_name = os.getenv("IMAGE_FILE_NAME", "image.png")
     await tool_context.save_artifact(
-        "image.png",
+        image_name,
         types.Part.from_bytes(data=image_bytes, mime_type="image/png"),
     )
     return {
-        'status': 'success',
-        'detail': 'Image generated successfully and stored in artifacts.',
-        'filename': os.getenv("IMAGE_FILE_NAME"),
+        "status": "success",
+        "detail": "Image generated successfully and stored in artifacts.",
+        "filename": image_name,
     }

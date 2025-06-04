@@ -21,7 +21,7 @@ load_dotenv()
 logging.basicConfig(level=logging.ERROR)
 
 MODEL = "gemini-2.5-pro-preview-05-06"
-IMAGE_FILE_NAME = os.getenv("IMAGE_FILE_NAME")
+IMAGE_FILE_NAME = os.getenv("IMAGE_FILE_NAME", "image.png")
 
 BLOG_COORDINATOR_PROMPT = """
 マーケティングとコンテンツ戦略の専門家です。あなたの目的は、ユーザーが魅力的なブログ記事を作成し、多くの反響を得られるようにサポートすることです。
