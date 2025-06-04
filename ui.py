@@ -22,7 +22,7 @@ else:
 
 from blog_writer_agents.agent import root_agent
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, force=True)
 load_dotenv()
 
 
