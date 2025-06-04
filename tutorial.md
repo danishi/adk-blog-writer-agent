@@ -33,7 +33,7 @@ teachme tutorial.md
    IMAGE_FILE_NAME=image.png
    
    # Streamlit
-   REMOTE_AGENT_ENGINE_ID=9999999999999999999
+   REMOTE_AGENT_ENGINE_ID=9999999999999999999 # Agent Engineデプロイ後に差し替える
    ```
 
 4. Python 仮想環境を作成して依存パッケージをインストールします。
@@ -61,13 +61,13 @@ python deploy.py --create
 作成済みのエージェントを確認する場合は次のコマンドを実行します。
 
 ```bash
-python deployment/deploy.py --list
+python deploy.py --list
 ```
 
 不要になったエージェントを削除する場合は `--delete` オプションとリソース ID を指定します。
 
 ```bash
-python deployment/deploy.py --delete --resource_id=${AGENT_ENGINE_ID}
+python deploy.py --delete --resource_id=${AGENT_ENGINE_ID}
 ```
 
 ## UI Testing
