@@ -64,3 +64,14 @@ python deploy.py --delete --resource_id=<ENGINE_ID>  # 削除
 teachme tutorial.md
 ```
 
+
+## コードチェック
+
+開発時には `flake8` を使用してコードのスタイルを確認できます。
+以下のコマンドで追加の依存関係をインストールし、チェックを実行してください。
+
+```bash
+pip install -r requirements-dev.txt
+flake8
+```
+
