@@ -20,7 +20,7 @@ from google.adk.models import LlmResponse
 load_dotenv()
 logging.basicConfig(level=logging.ERROR)
 
-MODEL = "gemini-2.5-pro-preview-06-05"
+MODEL = "gemini-2.5-pro-preview-05-06"
 IMAGE_FILE_NAME = os.getenv("IMAGE_FILE_NAME", "image.png")
 
 BLOG_COORDINATOR_PROMPT = """
@@ -39,6 +39,7 @@ BLOG_COORDINATOR_PROMPT = """
 * **期待される出力：** リサーチャーサブエージェントは、少なくとも10個の鮮度の高いブログ記事のアイデアを生成します。
 * **注意点：** ユーザーが選んだテーマに基づいて、ブログ記事のアイデアを提案してください。例えば、旅行なら「世界の絶景スポット」や「バックパッカーの旅のコツ」など。
   ユニークで読者の関心を引くような、ブランド性の高い名前を提案してください。
+  アイデアのもととなったURLが提示されている場合はそれも示しましょう。
   リストをユーザーに提示し、1つを選んでもらいましょう。
 
 ---

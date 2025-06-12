@@ -4,6 +4,7 @@ import copy
 from google.adk import Agent
 from google.adk.tools import google_search
 from google.adk.agents.callback_context import CallbackContext
+from google.adk.models import LlmResponse
 from google.genai import types
 from typing import Optional
 
@@ -29,8 +30,18 @@ def grounding_metadata_callback(
 
             modified_parts = [copy.deepcopy(part) for part in llm_response.content.parts]
 
+            grounding_chunks = []
             grounding_metadata = getattr(llm_response, 'grounding_metadata', None)
-            grounding_chunks = getattr(grounding_metadata, 'grounding_chunks', []) if grounding_metadata else []
+
+            if grounding_metadata:
+                chunks = getattr(grounding_metadata, 'grounding_chunks', None)
+                if isinstance(chunks, list):
+                    grounding_chunks = chunks
+                else:
+                    logging.warning("[Callback] grounding_chunks is None or not a list.")
+            else:
+                logging.warning("[Callback] grounding_metadata is None.")
+
             logging.info(f"[Callback] grounding_chunks: {grounding_chunks}")
 
             references = {}
@@ -94,4 +105,5 @@ researcher_agent = Agent(
     instruction=prompt.RESEARCHER_PROMPT,
     output_key="researcher_agent_output",
     tools=[google_search],
+    after_model_callback=grounding_metadata_callback,
 )
