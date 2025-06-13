@@ -1,6 +1,8 @@
 """ルートエージェント"""
 
-import copy, base64, os
+import copy
+import base64
+import os
 from io import BytesIO
 from PIL import Image
 import logging
@@ -12,7 +14,7 @@ from dotenv import load_dotenv
 from .sub_agents.researcher import researcher_agent
 from .sub_agents.blog_editor import blog_editor_agent
 from .tools.generate_image import generate_image
-from google.adk.tools import ToolContext, load_artifacts
+from google.adk.tools import load_artifacts
 from google.genai.types import Part
 from google.adk.agents.callback_context import CallbackContext
 from google.adk.models import LlmResponse
@@ -107,7 +109,7 @@ async def callback_load_artifact(
         llm_response_new.content.parts = parts_new
         return llm_response_new
 
-    except Exception as e: # fall back to the original response
+    except Exception as e:  # fall back to the original response
         logging.error(e)
         return llm_response
 
