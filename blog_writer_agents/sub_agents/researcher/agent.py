@@ -83,7 +83,10 @@ def grounding_metadata_callback(
             return new_response
 
         elif llm_response.content.parts[0].function_call:
-            logging.info(f"[Callback] Inspected response: Contains function call '{llm_response.content.parts[0].function_call.name}'. No text modification.")
+            logging.info(
+                "[Callback] Inspected response: Contains function call "
+                f"'{llm_response.content.parts[0].function_call.name}'. No text modification."
+            )
             return None
 
         else:

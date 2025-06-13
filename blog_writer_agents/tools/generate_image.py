@@ -1,11 +1,12 @@
 import os
 
 from dotenv import load_dotenv
+from google.adk.tools import ToolContext
 from google.genai import Client, types
 
-async def generate_image(prompt: str, tool_context: 'ToolContext'):
+
+async def generate_image(prompt: str, tool_context: ToolContext):
     """Generates an image based on the prompt."""
-    MODEL = "gemini-2.0-flash-001" 
     MODEL_IMAGE = "imagen-3.0-generate-002"
 
     load_dotenv()

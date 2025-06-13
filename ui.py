@@ -60,6 +60,8 @@ init_vertexai()
 ENV = os.getenv("ENV", "local")
 
 # Agent取得
+
+
 @st.cache_resource
 def get_remote_agent(agent_id):
     try:
@@ -74,7 +76,9 @@ def get_remote_agent(agent_id):
         st.error(f"Agent取得エラー: {e}")
         st.stop()
 
+
 remote_agent = get_remote_agent(agent_id)
+
 
 # ユーザーに紐づくセッション一覧取得
 async def fetch_session_ids(user_id: str):
@@ -109,7 +113,10 @@ if "session_id" in st.session_state and st.session_state["session_id"] in sessio
     index = session_list.index(st.session_state["session_id"]) + 1
 selected = st.sidebar.selectbox("セッション選択", options=options, index=index)
 
+
 # セッション管理
+
+
 async def manage_session(user_id, agent_id, selected_session_id=None):
     if (
         "session_id" not in st.session_state
@@ -146,7 +153,10 @@ for msg in st.session_state["messages"]:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
 
+
 # ユーザー入力
+
+
 async def handle_user_input(prompt):
     st.session_state["messages"].append({"role": "user", "content": prompt})
     with st.chat_message("user"):
@@ -173,9 +183,13 @@ async def handle_user_input(prompt):
                             full_response += part["text"] + " "
                         message_placeholder.markdown(full_response + "▌")
                     if "function_call" in part:
-                        message_placeholder.markdown(full_response + f"\n\n🔧 tool_calling: {str(part['function_call'])}")
+                        message_placeholder.markdown(
+                            full_response + f"\n\n🔧 tool_calling: {str(part['function_call'])}"
+                        )
                     if "function_response" in part:
-                        message_placeholder.markdown(full_response + f"\n\n🔨 tool_response: {str(part['function_response'])}")
+                        message_placeholder.markdown(
+                            full_response + f"\n\n🔨 tool_response: {str(part['function_response'])}"
+                        )
             message_placeholder.markdown(full_response)
         st.session_state["messages"].append({"role": "assistant", "content": full_response})
     except Exception as e:
