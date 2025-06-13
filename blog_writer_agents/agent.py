@@ -14,6 +14,7 @@ from dotenv import load_dotenv
 from .sub_agents.researcher import researcher_agent
 from .sub_agents.blog_editor import blog_editor_agent
 from .tools.generate_image import generate_image
+from .tools.get_current_datetime import get_current_datetime
 from google.adk.tools import load_artifacts
 from google.genai.types import Part
 from google.adk.agents.callback_context import CallbackContext
@@ -129,6 +130,7 @@ blog_coordinator = LlmAgent(
         AgentTool(agent=researcher_agent),
         AgentTool(agent=blog_editor_agent),
         generate_image,
+        get_current_datetime,
         load_artifacts
     ],
     sub_agents=[],
