@@ -7,6 +7,7 @@
 - **Researcher Agent**: キーワードに基づくブログ記事のアイデアを提案します。
 - **Blog Editor Agent**: 選択したテーマからプロフェッショナルな記事を生成します。
 - **Image Generator Tool**: ブログ用のアイキャッチ画像を作成します。
+- **Datetime Tool**: 現在の年月日と時刻を取得します。
 - **Streamlit UI**: チャット形式でエージェントとやり取りできる簡易 UI を提供します。
 
 ## 構成図
