@@ -18,7 +18,8 @@ from .tools.get_current_datetime import get_current_datetime
 from google.adk.tools import load_artifacts
 from google.genai.types import Part
 from google.adk.agents.callback_context import CallbackContext
-from google.adk.models import LlmResponse
+from google.adk.models import LlmResponse, LlmRequest
+from typing import Optional
 
 load_dotenv()
 logging.basicConfig(level=logging.ERROR)
@@ -73,6 +74,31 @@ BLOG_COORDINATOR_PROMPT = """
 
 ユーザーが迷わず進めるように、それぞれのステップで丁寧にサブエージェントに委任する背景と意図も説明してください。
 """
+
+
+async def filter_image_data_from_history(
+    callback_context: CallbackContext,
+    llm_request: LlmRequest
+) -> Optional[LlmResponse]:
+    """会話履歴から画像データを除外する
+    """
+    try:
+        # 各コンテンツをチェックして画像データを除外
+        for content in llm_request.contents:
+            if hasattr(content, 'parts'):
+                filtered_parts = []
+                for part in content.parts:
+                    if hasattr(part, 'text') and part.text:
+                        # data:imageで始まる画像データを除外
+                        if part.text.startswith('data:image'):
+                            continue
+                    filtered_parts.append(part)
+                content.parts = filtered_parts
+    except Exception as e:
+        logging.error(f"Error filtering image data: {e}")
+
+    # Noneを返してモデル呼び出しを続行
+    return None
 
 
 async def callback_load_artifact(
@@ -136,6 +162,7 @@ blog_coordinator = LlmAgent(
         load_artifacts
     ],
     sub_agents=[],
+    before_model_callback=filter_image_data_from_history,
     after_model_callback=callback_load_artifact
 )
 
