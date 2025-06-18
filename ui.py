@@ -83,10 +83,7 @@ remote_agent = get_remote_agent(agent_id)
 # ユーザーに紐づくセッション一覧取得
 async def fetch_session_ids(user_id: str):
     try:
-        if ENV == "local":
-            response = await remote_agent.list_sessions(user_id=user_id)
-        else:
-            response = remote_agent.list_sessions(user_id=user_id)
+        response = remote_agent.list_sessions(user_id=user_id)
         # response may be an object or a plain dictionary depending on environment
         sessions = None
         if isinstance(response, dict):
@@ -131,11 +128,10 @@ async def manage_session(user_id, agent_id, selected_session_id=None):
             if selected_session_id:
                 st.session_state["session_id"] = selected_session_id
             else:
+                session = remote_agent.create_session(user_id=user_id)
                 if ENV == "local":
-                    session = await remote_agent.create_session(user_id=user_id)
                     st.session_state["session_id"] = session.id
                 else:
-                    session = remote_agent.create_session(user_id=user_id)
                     st.session_state["session_id"] = session["id"]
 
             st.session_state["last_agent_id"] = agent_id

@@ -1,8 +1,8 @@
-google-adk==1.0.0
-google-genai==1.16.1
+google-adk==1.3.0
+google-genai==1.17.0
 pydantic==2.11.5
 python-dotenv==1.1.0
-google-cloud-aiplatform[adk,agent-engines]==1.91.0
+google-cloud-aiplatform[adk,agent-engines]==1.95.1
 absl-py==2.2.1
 pillow==11.2.1
 streamlit==1.45.1
