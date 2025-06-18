@@ -11,7 +11,7 @@ from typing import Optional
 from . import prompt
 
 logging.basicConfig(level=logging.INFO, force=True)
-MODEL = "gemini-2.5-flash-preview-05-20"
+MODEL = "gemini-2.5-flash"
 
 
 def grounding_metadata_callback(

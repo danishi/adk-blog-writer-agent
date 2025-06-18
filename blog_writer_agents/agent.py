@@ -24,7 +24,7 @@ from typing import Optional
 load_dotenv()
 logging.basicConfig(level=logging.ERROR)
 
-MODEL = "gemini-2.5-pro-preview-05-06"
+MODEL = "gemini-2.5-pro"
 IMAGE_FILE_NAME = os.getenv("IMAGE_FILE_NAME", "image.png")
 
 BLOG_COORDINATOR_PROMPT = """
