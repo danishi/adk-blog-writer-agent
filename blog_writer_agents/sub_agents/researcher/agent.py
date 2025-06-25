@@ -5,6 +5,7 @@ from google.adk import Agent
 from google.adk.tools import google_search
 from google.adk.agents.callback_context import CallbackContext
 from google.adk.models import LlmResponse
+from google.adk.planners import BuiltInPlanner
 from google.genai import types
 from typing import Optional
 
@@ -104,6 +105,11 @@ def grounding_metadata_callback(
 
 researcher_agent = Agent(
     model=MODEL,
+    planner=BuiltInPlanner(
+        thinking_config=types.ThinkingConfig(
+            thinking_budget=1024,
+        )
+    ),
     name="researcher_agent",
     instruction=prompt.RESEARCHER_PROMPT,
     output_key="researcher_agent_output",

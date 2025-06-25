@@ -20,6 +20,8 @@ from google.genai.types import Part
 from google.adk.agents.callback_context import CallbackContext
 from google.adk.models import LlmResponse, LlmRequest
 from typing import Optional
+from google.adk.planners import BuiltInPlanner
+from google.genai import types
 
 load_dotenv()
 logging.basicConfig(level=logging.ERROR)
@@ -92,6 +94,15 @@ async def filter_image_data_from_history(
                         # data:imageで始まる画像データを除外
                         if part.text.startswith('data:image'):
                             continue
+                        # 前回までの <artifact> タグを除去
+                        part.text = part.text.replace(
+                            f'<artifact>{IMAGE_FILE_NAME}</artifact>',
+                            ''
+                        )
+                        part.text = part.text.replace(
+                            f'<artifact>_none_{IMAGE_FILE_NAME}</artifact>',
+                            ''
+                        )
                     filtered_parts.append(part)
                 content.parts = filtered_parts
     except Exception as e:
@@ -146,6 +157,11 @@ async def callback_load_artifact(
 blog_coordinator = LlmAgent(
     name="blog_coordinator",
     model=MODEL,
+    planner=BuiltInPlanner(
+        thinking_config=types.ThinkingConfig(
+            thinking_budget=1024,
+        )
+    ),
     description=(
         "ブログ記事の作成を支援するエージェントです。"
         "ユーザーが魅力的なブログ記事を作成し、多くの反響を得られるようにサポートします。"
