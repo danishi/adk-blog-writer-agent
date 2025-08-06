@@ -1,5 +1,7 @@
 # ADK Blog Writer Agent
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/danishi/adk-blog-writer-agent)
+
 このリポジトリは Google ADK を利用してブログ記事の作成を支援するエージェントのサンプルです。リサーチャー、ブログ編集者、画像生成ツールを組み合わせ、ブログの企画から記事執筆、アイキャッチ画像の生成までを行います。
 
 https://github.com/user-attachments/assets/b3e88298-a6d9-4c21-a118-6c14d47bba24
